@@ -1,16 +1,19 @@
-import {Component} from '@angular/core';
-import {NavController} from 'ionic-angular';
-import { InAppBrowser } from 'ionic-native';
+import { Component } from '@angular/core';
+import { PopoverController } from 'ionic-angular';
+
+import { PopoverPage } from '../about-popover/about-popover';
 
 @Component({
+  selector: 'page-about',
   templateUrl: 'about.html'
 })
 export class AboutPage {
+  conferenceDate = '2047-05-17';
 
-  constructor(private navCtrl: NavController) {
-  }
+  constructor(public popoverCtrl: PopoverController) { }
 
-  openUrl(url) {
-    let browser = new InAppBrowser(url, '_blank', 'location=yes');
+  presentPopover(event: Event) {
+    let popover = this.popoverCtrl.create(PopoverPage);
+    popover.present({ ev: event });
   }
 }

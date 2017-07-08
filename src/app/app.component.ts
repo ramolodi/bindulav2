@@ -1,129 +1,169 @@
-import {Component, ViewChild, OnInit } from '@angular/core';
-import {Platform, Nav, MenuController, ViewController, Events, ModalController } from 'ionic-angular';
-import { Network, Splashscreen, StatusBar } from 'ionic-native';
-import { Subscription } from '../../node_modules/rxjs/Subscription';
+import { Component, ViewChild } from '@angular/core';
 
-import { AuthService } from '../shared/services/auth.service';
-import { DataService } from '../shared/services/data.service';
-import { SqliteService } from '../shared/services/sqlite.service';
-import {TabsPage} from '../pages/tabs/tabs';
+import { Events, MenuController, Nav, Platform } from 'ionic-angular';
+import { SplashScreen } from '@ionic-native/splash-screen';
+
+import { Storage } from '@ionic/storage';
+
+import { AboutPage } from '../pages/about/about';
+import { AccountPage } from '../pages/account/account';
 import { LoginPage } from '../pages/login/login';
+import { MapPage } from '../pages/map/map';
 import { SignupPage } from '../pages/signup/signup';
+import { TabsPage } from '../pages/tabs/tabs';
+import { TutorialPage } from '../pages/tutorial/tutorial';
+import { SchedulePage } from '../pages/schedule/schedule';
+import { SpeakerListPage } from '../pages/speaker-list/speaker-list';
+import { SupportPage } from '../pages/support/support';
 
+import { ConferenceData } from '../providers/conference-data';
+import { UserData } from '../providers/user-data';
 
-declare var window: any;
+export interface PageInterface {
+  title: string;
+  name: string;
+  component: any;
+  icon: string;
+  logsOut?: boolean;
+  index?: number;
+  tabName?: string;
+  tabComponent?: any;
+}
 
 @Component({
-  templateUrl: 'app.html'
+  templateUrl: 'app.template.html'
 })
-export class ForumApp implements OnInit {
-  @ViewChild('content') nav: any;
+export class ConferenceApp {
+  // the root nav is a child of the root app component
+  // @ViewChild(Nav) gets a reference to the app's root nav
+  @ViewChild(Nav) nav: Nav;
 
-  public rootPage: any;
-  public loginPage: LoginPage;
+  // List of pages that can be navigated to from the left menu
+  // the left menu only works after login
+  // the login page disables the left menu
+  appPages: PageInterface[] = [
+    { title: 'Schedule', name: 'TabsPage', component: TabsPage, tabComponent: SchedulePage, index: 0, icon: 'calendar' },
+    { title: 'Speakers', name: 'TabsPage', component: TabsPage, tabComponent: SpeakerListPage, index: 1, icon: 'contacts' },
+    { title: 'Map', name: 'TabsPage', component: TabsPage, tabComponent: MapPage, index: 2, icon: 'map' },
+    { title: 'About', name: 'TabsPage', component: TabsPage, tabComponent: AboutPage, index: 3, icon: 'information-circle' }
+  ];
+  loggedInPages: PageInterface[] = [
+    { title: 'Account', name: 'AccountPage', component: AccountPage, icon: 'person' },
+    { title: 'Support', name: 'SupportPage', component: SupportPage, icon: 'help' },
+    { title: 'Logout', name: 'TabsPage', component: TabsPage, icon: 'log-out', logsOut: true }
+  ];
+  loggedOutPages: PageInterface[] = [
+    { title: 'Login', name: 'LoginPage', component: LoginPage, icon: 'log-in' },
+    { title: 'Support', name: 'SupportPage', component: SupportPage, icon: 'help' },
+    { title: 'Signup', name: 'SignupPage', component: SignupPage, icon: 'person-add' }
+  ];
+  rootPage: any;
 
-  connectSubscription: Subscription;
-
-  constructor(platform: Platform,
-    public dataService: DataService,
-    public authService: AuthService,
-    public sqliteService: SqliteService,
-    public menu: MenuController,
+  constructor(
     public events: Events,
-    public modalCtrl: ModalController) {
-    var self = this;
-    this.rootPage = TabsPage;
+    public userData: UserData,
+    public menu: MenuController,
+    public platform: Platform,
+    public confData: ConferenceData,
+    public storage: Storage,
+    public splashScreen: SplashScreen
+  ) {
 
-    platform.ready().then(() => {
-      if (window.cordova) {
-        // Okay, so the platform is ready and our plugins are available.
-        // Here you can do any higher level native things you might need.
-        StatusBar.styleDefault();
-        self.watchForConnection();
-        self.watchForDisconnect();
-        Splashscreen.hide();
+    // Check if the user has already seen the tutorial
+    this.storage.get('hasSeenTutorial')
+      .then((hasSeenTutorial) => {
+        if (hasSeenTutorial) {
+          this.rootPage = TabsPage;
+        } else {
+          this.rootPage = TutorialPage;
+        }
+        this.platformReady()
+      });
 
-        console.log('in ready..');
-        let array: string[] = platform.platforms();
-        console.log(array);
-        self.sqliteService.InitDatabase();
-      }
+    // load the conference data
+    confData.load();
+
+    // decide which menu items should be hidden by current login status stored in local storage
+    this.userData.hasLoggedIn().then((hasLoggedIn) => {
+      this.enableMenu(hasLoggedIn === true);
     });
+    this.enableMenu(true);
+
+    this.listenToLoginEvents();
   }
 
-  watchForConnection() {
-    var self = this;
-    Network.onConnect().subscribe(() => {
-      console.log('network connected!');
-      // We just got a connection but we need to wait briefly
-      // before we determine the connection type.  Might need to wait
-      // prior to doing any api requests as well.
-      setTimeout(() => {
-        console.log('we got a connection..');
-        console.log('Firebase: Go Online..');
-        self.dataService.goOnline();
-        self.events.publish('network:connected', true);
-      }, 3000);
-    });
-  }
+  openPage(page: PageInterface) {
+    let params = {};
 
-  watchForDisconnect() {
-    var self = this;
-    // watch network for a disconnect
-    Network.onDisconnect().subscribe(() => {
-      console.log('network was disconnected :-(');
-      console.log('Firebase: Go Offline..');
-      //self.sqliteService.resetDatabase();
-      self.dataService.goOffline();
-      self.events.publish('network:connected', false);
-    });
-  }
+    // the nav component was found using @ViewChild(Nav)
+    // setRoot on the nav to remove previous pages and only have this page
+    // we wouldn't want the back button to show in this scenario
+    if (page.index) {
+      params = { tabIndex: page.index };
+    }
 
-  hideSplashScreen() {
-    if (Splashscreen) {
-      setTimeout(() => {
-        Splashscreen.hide();
-      }, 100);
+    // If we are already on tabs just change the selected tab
+    // don't setRoot again, this maintains the history stack of the
+    // tabs even if changing them from the menu
+    if (this.nav.getActiveChildNav() && page.index != undefined) {
+      this.nav.getActiveChildNav().select(page.index);
+    // Set the root of the nav with params if it's a tab index
+  } else {
+      this.nav.setRoot(page.name, params).catch((err: any) => {
+        console.log(`Didn't set nav root: ${err}`);
+      });
+    }
+
+    if (page.logsOut === true) {
+      // Give the menu time to close before changing to logged out
+      this.userData.logout();
     }
   }
 
-  ngOnInit() {
-
+  openTutorial() {
+    this.nav.setRoot(TutorialPage);
   }
 
-  ngAfterViewInit() {
-    var self = this;
+  listenToLoginEvents() {
+    this.events.subscribe('user:login', () => {
+      this.enableMenu(true);
+    });
 
-    this.authService.onAuthStateChanged(function (user) {
-      if (user === null) {
-        self.menu.close();
-        //self.nav.setRoot(LoginPage);
+    this.events.subscribe('user:signup', () => {
+      this.enableMenu(true);
+    });
 
-        let loginodal = self.modalCtrl.create(LoginPage);
-        loginodal.present();
-      }
+    this.events.subscribe('user:logout', () => {
+      this.enableMenu(false);
     });
   }
 
-  openPage(page) {
-    let viewCtrl: ViewController = this.nav.getActive();
-    // close the menu when clicking a link from the menu
-    this.menu.close();
+  enableMenu(loggedIn: boolean) {
+    this.menu.enable(loggedIn, 'loggedInMenu');
+    this.menu.enable(!loggedIn, 'loggedOutMenu');
+  }
 
-    if (page === 'signup') {
-      if (!(viewCtrl.instance instanceof SignupPage))
-        this.nav.push(SignupPage);
+  platformReady() {
+    // Call any initial plugins when ready
+    this.platform.ready().then(() => {
+      this.splashScreen.hide();
+    });
+  }
+
+  isActive(page: PageInterface) {
+    let childNav = this.nav.getActiveChildNav();
+
+    // Tabs are a special case because they have their own navigation
+    if (childNav) {
+      if (childNav.getSelected() && childNav.getSelected().root === page.tabComponent) {
+        return 'primary';
+      }
+      return;
     }
-  }
 
-  signout() {
-    var self = this;
-    self.menu.close();
-    self.authService.signOut();
-  }
-
-  isUserLoggedIn(): boolean {
-    let user = this.authService.getLoggedInUser();
-    return user !== null;
+    if (this.nav.getActive() && this.nav.getActive().name === page.name) {
+      return 'primary';
+    }
+    return;
   }
 }

@@ -1,168 +1,208 @@
-<h2>Building hybrid mobile applications using Ionic 2 and Firebase</h2>
+﻿# Ionic Conference Application
 
-Blog post: <a href="http://wp.me/p3mRWu-19N" target="_blank">Building hybrid mobile apps using Ionic 2 and Firebase</a>
+Modyfying demo of Ionic with TypeScript.
 
-<a href="http://wp.me/p3mRWu-19N" rel="attachment wp-att-3961" target="_blank"><img src="https://chsakell.files.wordpress.com/2016/08/ionic2-angular2-firebase-36.png" alt="aspnet5-agnular2-03" class="alignnone size-full wp-image-3961"></a>
 
-<h3>Frameworks - Tools - Libraries</h3>
-<ul>
-<li>Ionic 2</li>
-<li>Angular 2</li>
-<li>Firebase</li>
-<li>TypeScript</li>
-</ul>
+## Important!
+**There is not an actual Ionic Conference at this time.** This project is just to show off Ionic components in a real-world application. Please go through the steps in [CONTRIBUTING.md](https://github.com/ionic-team/ionic-conference-app/blob/master/.github/CONTRIBUTING.md) before submitting an issue.
 
-<h3>Forum app's features</h3>
-<ul>
-<li>Image capture / upload from Camera and Photo album</li>
-<li>Network detection</li>
-<li>Open in app browser</li>
-<li>SQLite support and offline operation</li>
-<li>Lot's of Ionic's 2 components (cards, lists, action sheets, modals, toast, etc..)</li>
-</ul>
 
-<h3>Installation instructions - Part 1 (Firebase)</h3>
+## Table of Contents
+ - [Getting Started](#getting-started)
+ - [Contributing](#contributing)
+ - [Use Cases](#use-cases)
+ - [App Preview](#app-preview)
+ - [File Structure of App](#file-structure-of-app)
 
-1. Login in <a href="https://firebase.google.com/" target="_blank">Firebase</a> with your Google account.
-2. Click the Go to console button and press <b>CREATE NEW PROJECT</b>.
-3. Name the project ForumApp and choose your country.
-4. While in the ForumApp console, click the Auth button and select the <b>SIGN-IN METHOD</b> tab. Enable the <b>Email/Password</b> provider and click SAVE.
-5. Click <i>Database</i> from the left menu and select the <i>RULES</i> tab. Set the JSON object as follow:
 
-    ```javascript
-{
-"rules": {
-".read": "auth != null",
-".write": "auth != null",
-    "statistics" : {
-    "threads": {
-    // /statistics/threads is readable by the world
-    ".read": true,
-    // /statistics/threads is writable by the world
-    ".write": true
-      }
-    },
-    "threads" : {
-        // /threads is readable by the world
-    ".read": true,
-    // /threads is writable by the world
-    ".write": true
-    }  
-  }
-}
-    ```
+## Getting Started
 
-6. Click <b>Storage</b> from the left menu and select the <i>RULES</i> tab. Set the JSON object as follow:
+* Clone this repository: `git clone https://github.com/ionic-team/ionic-conference-app.git`.
+* Want to use TypeScript? Both the `master` branch and the `typescript` branch now use TypeScript.
+* Run `npm install` from the project root.
+* Install the ionic CLI (`npm install -g ionic`)
+* Run `ionic serve` in a terminal from the project root.
+* Profit
 
-    ```javascript
-function() {
-service firebase.storage {
-  match /b/forumapp-your_id.appspot.com/o {
-    match /{allPaths=**} {
-      allow read;
-      allow write: if request.auth != null;
-    }
-  }
-}
-    ```
-Make sure to replace the your_id with your's.  
+**Note:** Is your build slow? Update `npm` to 3.x: `npm install -g npm`.
 
-<h3>Installation instructions - Part 2 (Ionic 2 Forum app)</h3>
-1. Clone or download the source code of this repository.
-2. Open the forum app in your IDE of your preference.
-3. Run the following commands in the exact order.
 
-    ```
-npm install -g ionic
-npm install -g cordova
-npm install
-ionic plugin add com-sarriaroman-photoviewer
-ionic plugin add cordova-plugin-camera
-ionic plugin add cordova-plugin-inappbrowser
-ionic plugin add cordova-sqlite-storage
-ionic plugin add cordova-plugin-network-information
-ionic plugin add cordova-plugin-splashscreen
-    ```
+## Contributing
+See [CONTRIBUTING.md](https://github.com/ionic-team/ionic-conference-app/blob/master/.github/CONTRIBUTING.md) :tada::+1:
 
-<h3>Running the app</h3>
-<ul>
-	<li>In Firebase ForumApp project console, click the Add Firebase to your web app button.</li>
-	<li>Copy the contents and paste them in the src/index.html file (you will find a <b>Paste your settings here</b> section)</li>
-	<li>If you want to run the app in browser simply run the following command.
-		<ul>
-			<li>ionic serve --lab</li>
-		</ul>
-	</li>
-	<li> If you want to build and run the app on your device, first you need to add the respective platform.
-		<ol>
-			<li>ionic platform add android</li>
-			<li>ionic platform add ios</li>
-		</ol>
-	</li>
-	<li> Next you need to install some prerequisites depending on the type of your device.
-		<ol>
-			<li><a href="https://cordova.apache.org/docs/en/latest/guide/platforms/android/" target="_blank">Android Platform Guide</a></li>
-			<li><a href="https://cordova.apache.org/docs/en/latest/guide/platforms/ios/index.html" target="_blank">iOS Platform Guide</a></li>
-			<li><a href="https://cordova.apache.org/docs/en/latest/guide/platforms/win8/index.html" target="_blank">Windows Platform Guide</a></li>
-		</ol>
-	</li>
-	<li>Set your device properly, for example <a href="https://developer.android.com/training/basics/firstapp/running-app.html" target="_blank">here's</a> what you need to do first for running the app in an Android device</li>
-	<li>
-		Connect your device to your computer
-	</li>
-	<li>
-		Run the following command depending on your device type.
-		<ul>
-			<li>ionic run android</li>
-			<li>ionic run ios</li>
-		</ul>
-	</li>
-</ul>
 
-<h3 style="font-weight:normal;">Forum app preview</h3>
-<img src="https://chsakell.files.wordpress.com/2016/08/ionic2-angular2-firebase-00.gif"/>
-<img src="https://chsakell.files.wordpress.com/2016/08/ionic2-angular2-firebase-23.gif"/>
-<img src="https://chsakell.files.wordpress.com/2016/08/ionic2-angular2-firebase-38.gif"/>
+## Use Cases
 
-<h2>Donations</h2>
-For being part of open source projects and documenting my work here and on <a href="https://chsakell.com">chsakell's blog</a> I really do not charge anything. I try to avoid any type of ads also.
+* Action Sheet - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/speaker-list/speaker-list.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/speaker-list/speaker-list.ts) ]
+* Alert - [ [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
+* Cards - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/speaker-list/speaker-list.html) ]
+* Datetime - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/about/about.html) ]
+* Grid - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/login/login.html) ]
+* Inputs - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/login/login.html) ]
+* Items (Sliding) - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
+* Menu - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/app/app.template.html) |
+[code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/app/app.component.ts) ]
+* Modal - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule-filter/schedule-filter.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
+* Searchbar - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
+* Segment - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
+* Slides - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/tutorial/tutorial.html) |
+* Sticky headers - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.html) ]
+* Tabs - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/tabs/tabs.html) | [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/tabs/tabs.ts) ]
+* Toggle - [ [template](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule-filter/schedule-filter.html) ]
+[code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/tutorial/tutorial.ts) ]
+* Using Angular HTTP for JSON - [ [code](https://github.com/ionic-team/ionic-conference-app/blob/master/src/providers/conference-data.ts) | [usage](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.ts) ]
 
-If you think that any information you obtained here is worth of some money and are willing to pay for it, feel free to send any amount through paypal.
 
-<table>
-<tr><th>Paypal</th></tr>
-<tbody>
-<tr>
-<td><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chsakell%40gmail%2ecom&lc=US&item_name=Donation%20for%20chsakell%27s%20blog&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted" style="text-align:center;display:block">
-<img src="https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_cc_147x47.png" alt="Buy me a beer" />
-</a></td>
-</tr>
-</tbody>
-</table>
+## App Preview
 
-<h3 style="font-weight:normal;">Follow chsakell's Blog</h3>
-<table id="gradient-style" style="box-shadow:3px -2px 10px #1F394C;font-size:12px;margin:15px;width:290px;text-align:left;border-collapse:collapse;" summary="">
-<thead>
-<tr>
-<th style="width:130px;font-size:13px;font-weight:bold;padding:8px;background:#1F1F1F repeat-x;border-top:2px solid #d3ddff;border-bottom:1px solid #fff;color:#E0E0E0;" align="center" scope="col">Facebook</th>
-<th style="font-size:13px;font-weight:bold;padding:8px;background:#1F1F1F repeat-x;border-top:2px solid #d3ddff;border-bottom:1px solid #fff;color:#E0E0E0;" align="center" scope="col">Twitter</th>
-</tr>
-</thead>
-<tfoot>
-<tr>
-<td colspan="4" style="text-align:center;">Microsoft Web Application Development</td>
-</tr>
-</tfoot>
-<tbody>
-<tr>
-<td style="padding:8px;border-bottom:1px solid #fff;color:#FFA500;border-top:1px solid #fff;background:#1F394C repeat-x;">
-<a href="https://www.facebook.com/chsakells.blog" target="_blank"><img src="https://chsakell.files.wordpress.com/2015/08/facebook.png?w=120&amp;h=120&amp;crop=1" alt="facebook" width="120" height="120" class="alignnone size-opti-archive wp-image-3578"></a>
-</td>
-<td style="padding:8px;border-bottom:1px solid #fff;color:#FFA500;border-top:1px solid #fff;background:#1F394C repeat-x;">
-<a href="https://twitter.com/chsakellsBlog" target="_blank"><img src="https://chsakell.files.wordpress.com/2015/08/twitter-small.png?w=120&amp;h=120&amp;crop=1" alt="twitter-small" width="120" height="120" class="alignnone size-opti-archive wp-image-3583"></a>
-</td>
-</tr>
-</tbody>
-</table>
-<h3>License</h3>
-Code released under the <a href="https://github.com/chsakell/ionic2-angular2-firebase/blob/master/licence" target="_blank"> MIT license</a>.
+[Try it live](https://ionic-team.github.io/ionic-conference-app/www)
+
+All app preview screenshots were taken by running `ionic serve --lab` on a retina display.
+
+- [Schedule Page](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/schedule/schedule.html)
+
+  <img src="resources/screenshots/SchedulePage.png" alt="Schedule">
+
+
+- [About Page](https://github.com/ionic-team/ionic-conference-app/blob/master/src/pages/about/about.html)
+
+  <img src="resources/screenshots/AboutPage.png" alt="Schedule">
+
+
+- To see more images of the app, check out the [screenshots directory](https://github.com/ionic-team/ionic-conference-app/tree/master/resources/screenshots)!
+
+
+## Deploying
+
+* PWA - Un-comment [this](https://github.com/ionic-team/ionic2-app-base/blob/master/src/index.html#L17), run `npm run ionic:build --prod` and then push the `www` folder to your favorite hosting service
+* Android - Run `ionic cordova run android --prod`
+* iOS - Run `ionic cordova run ios --prod`
+
+## File Structure of App
+
+```
+ionic-conference-app/
+├-- .github/                            * GitHub files
+│   ├── CONTRIBUTING.md                 * Documentation on contributing to this repo
+│   └── ISSUE_TEMPLATE.md               * Template used to populate issues in this repo
+|
+|-- resources/
+|
+|-- src/
+|    |-- app/
+|    |    ├── app.component.ts
+|    |    └── app.module.ts
+|    |    └── app.template.html
+|    |    └── main.ts
+|    |
+|    |-- assets/
+|    |    ├── data/
+|    |    |    └── data.json
+|    |    |
+|    |    ├── fonts/
+|    |    |     ├── ionicons.eot
+|    |    |     └── ionicons.svg
+|    |    |     └── ionicons.ttf
+|    |    |     └── ionicons.woff
+|    |    |     └── ionicons.woff2
+|    |    |
+|    |    ├── img/
+|    |
+|    |-- pages/                          * Contains all of our pages
+│    │    ├── about/                     * About tab page
+│    │    │    ├── about.html            * AboutPage template
+│    │    │    └── about.ts              * AboutPage code
+│    │    │    └── about.scss            * AboutPage stylesheet
+│    │    │
+│    │    ├── account/                   * Account page
+│    │    │    ├── account.html          * AccountPage template
+│    │    │    └── account.ts            * AccountPage code
+│    │    │    └── account.scss          * AccountPage stylesheet
+│    │    │
+│    │    │── login/                     * Login page
+│    │    │    ├── login.html            * LoginPage template
+│    │    │    └── login.ts              * LoginPage code
+│    │    │    └── login.scss            * LoginPage stylesheet
+│    │    │
+│    │    │── map/                       * Map tab page
+│    │    │    ├── map.html              * MapPage template
+│    │    │    └── map.ts                * MapPage code
+│    │    │    └── map.scss              * MapPage stylesheet
+│    │    │
+│    │    │── schedule/                  * Schedule tab page
+│    │    │    ├── schedule.html         * SchedulePage template
+│    │    │    └── schedule.ts           * SchedulePage code
+│    │    │    └── schedule.scss         * SchedulePage stylesheet
+│    │    │
+│    │    │── schedule-filter/            * Schedule Filter page
+│    │    │    ├── schedule-filter.html   * ScheduleFilterPage template
+│    │    │    └── schedule-filter.ts     * ScheduleFilterPage code
+│    │    │    └── schedule-filter.scss   * ScheduleFilterPage stylesheet
+│    │    │
+│    │    │── session-detail/            * Session Detail page
+│    │    │    ├── session-detail.html   * SessionDetailPage template
+│    │    │    └── session-detail.ts     * SessionDetailPage code
+│    │    │
+│    │    │── signup/                    * Signup page
+│    │    │    ├── signup.html           * SignupPage template
+│    │    │    └── signup.ts             * SignupPage code
+│    │    │
+│    │    │── speaker-detail/            * Speaker Detail page
+│    │    │    ├── speaker-detail.html   * SpeakerDetailPage template
+│    │    │    └── speaker-detail.ts     * SpeakerDetailPage code
+│    │    │    └── speaker-detail.scss   * SpeakerDetailPage stylesheet
+│    │    │
+│    │    │── speaker-list/              * Speakers tab page
+│    │    │    ├── speaker-list.html     * SpeakerListPage template
+│    │    │    └── speaker-list.ts       * SpeakerListPage code
+│    │    │    └── speaker-list.scss     * SpeakerListPage stylesheet
+|    |    |
+│    │    │── support/                   * Support page
+│    │    │    ├── support.html          * SupportPage template
+│    │    │    └── support.ts            * SupportPage code
+│    │    │    └── support.scss          * SupportPage stylesheet
+│    │    │
+│    │    │── tabs/                      * Tabs page
+│    │    │    ├── tabs.html             * TabsPage template
+│    │    │    └── tabs.ts               * TabsPage code
+│    │    │
+│    │    └── tutorial/                  * Tutorial Intro page
+│    │         ├── tutorial.html         * TutorialPage template
+│    │         └── tutorial.ts           * TutorialPage code
+│    │         └── tutorial.scss         * TutorialPage stylesheet
+|    |
+│    ├── providers/                      * Contains all Injectables
+│    │     ├── conference-data.ts        * ConferenceData code
+│    │     └── user-data.ts              * UserData code
+│    ├── theme/                          * App theme files
+|    |     ├── variables.scss            * App Shared Sass Variables
+|    |
+|    |-- index.html
+|
+|-- www/
+|    ├── assets/
+|    |    ├── data/
+|    |    |    └── data.json
+|    |    |
+|    |    ├── fonts/
+|    |    |     ├── ionicons.eot
+|    |    |     └── ionicons.svg
+|    |    |     └── ionicons.ttf
+|    |    |     └── ionicons.woff
+|    |    |     └── ionicons.woff2
+|    |    |
+|    |    ├── img/
+|    |
+|    └── build/
+|    └── index.html
+|
+├── .editorconfig                       * Defines coding styles between editors
+├── .gitignore                          * Example git ignore file
+├── LICENSE                             * Apache License
+├── README.md                           * This file
+├── config.xml                          * Cordova configuration file
+├── ionic.config.json                   * Ionic configuration file
+├── package.json                        * Defines our JavaScript dependencies
+├── tsconfig.json                       * Defines the root files and the compiler options
+├── tslint.json                         * Defines the rules for the TypeScript linter
+```
